@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Tone Picker Tool</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f9f9f9; }
+        h1 { color: #333; }
+        .container { display: flex; gap: 20px; }
+        textarea { width: 400px; height: 300px; padding: 10px; font-size: 16px; }
+        .picker { display: grid; grid-template-columns: repeat(3, 120px); gap: 10px; margin-bottom: 10px; }
+        button { padding: 10px; cursor: pointer; border: none; border-radius: 5px; background-color: #eee; transition: background 0.2s; }
+        button:hover { background-color: #d3f4ff; }
+        #loading { color: blue; display: none; margin-bottom: 10px; }
+        #message { color: green; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Tone Picker Tool</h1>
+    <div class="container">
+        <!-- Left: Text Editor -->
+        <div>
+            <textarea id="editor" placeholder="Type your text here..."></textarea>
+        </div>
+
+        <!-- Right: Tone Picker -->
+        <div>
+            <div class="picker">
+                <button onclick="applyTone('casual','friendly', this)">Casual-Friendly</button>
+                <button onclick="applyTone('neutral','friendly', this)">Neutral-Friendly</button>
+                <button onclick="applyTone('formal','friendly', this)">Formal-Friendly</button>
+                <button onclick="applyTone('casual','neutral', this)">Casual-Neutral</button>
+                <button onclick="applyTone('neutral','neutral', this)">Neutral-Neutral</button>
+                <button onclick="applyTone('formal','neutral', this)">Formal-Neutral</button>
+                <button onclick="applyTone('casual','direct', this)">Casual-Direct</button>
+                <button onclick="applyTone('neutral','direct', this)">Neutral-Direct</button>
+                <button onclick="applyTone('formal','direct', this)">Formal-Direct</button>
+            </div>
+            <button onclick="undoText()">Undo</button>
+            <button onclick="redoText()">Redo</button>
+            <button onclick="resetText()">Reset</button>
+            <p id="loading">Processing...</p>
+            <p id="message"></p>
+        </div>
+    </div>
+
+    <script>
+       
+       
+       
+        let past = [];
+        let present = '';
+        let future = [];
+        let baselineText = '';
+
+        const editor = document.getElementById('editor');
+        const loading = document.getElementById('loading');
+        const message = document.getElementById('message');
+
+        baselineText = editor.value;
+        present = editor.value;
+
+
+
+
+
+        //to update present when user types
+        editor.addEventListener('input', () => { present = editor.value; });
+
+
+
+
+
+
+        //to  highlight selected tone button
+        function highlightSelected(button) {
+            document.querySelectorAll('.picker button').forEach(btn => btn.style.backgroundColor = '#eee');
+            button.style.backgroundColor = '#a8e0ff'; // highlight color
+        }
+        
+        
+        
+        
+        
+        
+        
+
+        // To Apply tone using backend + font style
+        async function applyTone(formality, warmth, button) {
+            if(!editor.value.trim()) return alert("Please enter text first");
+
+            past.push(present);
+            future = [];
+            loading.style.display = 'block';
+            highlightSelected(button);
+
+
+
+
+
+
+
+            // to Disable picker buttons
+            document.querySelectorAll('.picker button').forEach(btn => btn.disabled = true);
+
+            try {
+                const response = await fetch('http://localhost:8083/rewrite', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text: editor.value, formality, warmth })
+                });
+                const data = await response.json();
+                present = data.text;
+                editor.value = present;
+                
+                
+                
+                
+
+                // to Change font style based on tone
+                editor.style.fontStyle = formality === 'casual' ? 'italic' : 'normal';
+                editor.style.fontWeight = warmth === 'direct' ? 'bold' : 'normal';
+
+            } catch (err) {
+                alert("Failed to rewrite text: " + err);
+            } finally {
+                loading.style.display = 'none';
+                document.querySelectorAll('.picker button').forEach(btn => btn.disabled = false);
+            }
+        }
+
+
+
+
+
+        // for doing Undo
+        function undoText() {
+            if(past.length === 0) return;
+            future.push(present);
+            present = past.pop();
+            editor.value = present;
+        }
+        
+        
+        
+
+        // for Redo
+        function redoText() {
+            if(future.length === 0) return;
+            past.push(present);
+            present = future.pop();
+            editor.value = present;
+        }
+        
+        
+        
+        
+
+        //  for Reset
+        function resetText() {
+            past.push(present);
+            present = baselineText;
+            editor.value = baselineText;
+            future = [];
+            editor.style.fontStyle = 'normal';
+            editor.style.fontWeight = 'normal';
+            message.textContent = "Text reset!";
+            setTimeout(() => message.textContent = '', 1500);
+        }
+        
+        
+    </script>
+</body>
+</html>
