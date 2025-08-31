@@ -14,7 +14,6 @@ public class Tone {
 	
 	public Tone() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	public String getId() {

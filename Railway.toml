@@ -1,0 +1,12 @@
+# Railway.toml for tonepicker
+
+[build]
+  # Use Paketo Java buildpacks
+  builder = "paketobuildpacks/builder:base"
+
+[deploy]
+  # Command to run your Spring Boot app
+  start = "java -jar target/tonepicker-0.0.1-SNAPSHOT.jar"
+
+# Do NOT reference MISTRAL_API_KEY here — it will be read at runtime
+# Make sure to add MISTRAL_API_KEY in Railway → Project → Variables

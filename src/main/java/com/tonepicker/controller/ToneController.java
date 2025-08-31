@@ -58,7 +58,7 @@ public class ToneController {
             Map<String, Object> body = Map.of(
                 "model", "mistral-small-latest",
                 "messages", List.of(
-                    Map.of("role", "system", "content", "You are a helpful assistant."),
+                    Map.of("role","system","content","You are a helpful assistant."),
                     Map.of("role", "user", "content", prompt)
                 )
             );

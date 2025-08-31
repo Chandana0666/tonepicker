@@ -104,7 +104,7 @@
             document.querySelectorAll('.picker button').forEach(btn => btn.disabled = true);
 
             try {
-                const response = await fetch('http://localhost:8083/rewrite', {
+                const response = await fetch('http://localhost:8080/rewrite', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ text: editor.value, formality, warmth })

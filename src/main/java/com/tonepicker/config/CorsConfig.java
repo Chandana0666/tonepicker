@@ -12,8 +12,8 @@ public class CorsConfig {
 	        return new WebMvcConfigurer() {
 	            @Override
 	            public void addCorsMappings(CorsRegistry registry) {
-	                registry.addMapping("/**")   // allow all endpoints
-	                        .allowedOrigins("*") // allow all origins; for production, specify your frontend URL
+	                registry.addMapping("/**")   
+	                        .allowedOrigins("*") 
 	                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS");
 	            }
 	        };
